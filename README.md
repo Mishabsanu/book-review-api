@@ -49,6 +49,20 @@ cd book-review-api
 npm install
 ```
 
+Make sure to install `nodemon`:
+
+```bash
+npm install --save-dev nodemon
+```
+
+Update your `package.json` scripts:
+
+```json
+"scripts": {
+  "start": "nodemon server.js"
+}
+```
+
 ### 3. Setup Environment Variables
 
 Create a `.env` file in the root directory:
@@ -62,7 +76,7 @@ JWT_SECRET=your_jwt_secret_key
 ### 4. Start Server
 
 ```bash
-npm run dev
+npm start
 ```
 
 ---
@@ -70,43 +84,40 @@ npm run dev
 ## 🔑 Authentication Endpoints
 
 ```http
-POST /api/auth/signup
-POST /api/auth/login
+POST /api/V1/auth/signup
+POST /api/V1/auth/login
 ```
 
 ## 📚 Book Endpoints
 
 ```http
-                1# Add new book (authrequired) 
-POST   /api/V1/book/add-book   - >http://localhost:5000/api/V1/book/add-book
+# 1. Add new book (auth required)
+POST /api/V1/book/add-book
 
-                2# Get all books (pagination, filter)
-GET    /api/V1/book/get-books   ->http://localhost:5000/api/V1/book/get-books
+# 2. Get all books (pagination, filter)
+GET /api/V1/book/get-books
 
-                3# Get book by ID with reviews
-GET    /api/V1/book/get-book/:id            ->http://localhost:5000/api/V1/book/get-book/684089573401e1e4f4ea7503
+# 3. Get book by ID with reviews
+GET /api/V1/book/get-book/:id
 
-
-                4# Add review to book (auth)
-POST   /api/V1/review/books/:id/add-reviews    ->http://localhost:5000/api/V1/review/books/684089573401e1e4f4ea7503/add-reviews
+# 4. Add review to book (auth)
+POST /api/V1/review/books/:id/add-reviews
 ```
 
 ## ✏️ Review Endpoints
 
 ```http
- # Update own review
-PUT    /api/V1/review/update-review/:id        ->http://localhost:5000/api/V1/review/update-review/68408f3fbc9c06cf2081af60  
+# Update own review
+PUT /api/V1/review/update-review/:id
 
- # Delete own review
-DELETE /api/V1/review/delete-review/:id       ->http://localhost:5000/api/V1/review/delete-review/68408f3fbc9c06cf2081af60
+# Delete own review
+DELETE /api/V1/review/delete-review/:id
 ```
 
 ## 🔍 Search Endpoint
 
 ```http
-GET    /api/books/search?title=atomic&author=james&page=1&limit=10 -> http://localhost:5000/api/V1/book/search?title=Atomic Habits
-
-
+GET /api/V1/book/search?title=Atomic&author=James&page=1&limit=10
 ```
 
 ---
@@ -132,7 +143,7 @@ curl -X POST http://localhost:5000/api/V1/auth/login \
 ### Add Book
 
 ```bash
-curl -X POST http://localhost:5000/api/books \
+curl -X POST http://localhost:5000/api/V1/book/add-book \
   -H 'Authorization: Bearer <JWT_TOKEN>' \
   -H 'Content-Type: application/json' \
   -d '{"title":"Book Title","author":"Author","genre":"Fiction"}'
@@ -146,32 +157,44 @@ curl -X POST http://localhost:5000/api/books \
 
 ```js
 {
-  name: String,
-  email: String,
-  password: String (hashed)
+  name: String,                   // User's full name
+  email: String,                  // Unique user email
+  password: String,               // Hashed password
+  created_at: Date,               // Timestamp of creation
+  updated_at: Date,               // Timestamp of last update
+  deleted_at: Date | null         // Soft delete timestamp
 }
+
 ```
 
 ### Book
 
 ```js
 {
-  title: String,
-  author: String,
-  genre: String,
-  createdBy: ObjectId (User)
+  title: String,                  // Title of the book
+  genre: String,                  // Genre/category of the book
+  author: String,                 // Author name
+  createdBy: ObjectId (User),     // Reference to the User who created it
+  created_at: Date,               // Timestamp of creation
+  updated_at: Date,               // Timestamp of last update
+  deleted_at: Date | null         // Soft delete timestamp
 }
+
 ```
 
 ### Review
 
 ```js
 {
-  user: ObjectId (User),
-  book: ObjectId (Book),
-  rating: Number,
-  comment: String
+  user: ObjectId (User),          // Reference to the User who reviewed
+  book: ObjectId (Book),          // Reference to the Book being reviewed
+  rating: Number,                 // Star rating (e.g., 1 to 5)
+  comment: String,                // Review text
+  created_at: Date,               // Timestamp of creation
+  updated_at: Date,               // Timestamp of last update
+  deleted_at: Date | null         // Soft delete timestamp
 }
+
 ```
 
 ---
@@ -182,7 +205,3 @@ curl -X POST http://localhost:5000/api/books \
 - Only authenticated users can create or edit reviews.
 - Pagination is handled using `?page=1&limit=10`.
 - Search supports partial and case-insensitive title or author query.
-
----
-
-
