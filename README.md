@@ -39,7 +39,7 @@ book-review-api/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/book-review-api.git
+git clone https://github.com/Mishabsanu/book-review-api.git
 cd book-review-api
 ```
 
